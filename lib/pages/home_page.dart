@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/task_item.dart';
 import '../providers/task_provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -74,29 +75,14 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         final task = taskProvider.tasks[index];
 
-                        return Card(
-                          child: ListTile(
-                            leading: Checkbox(
-                              value: task.isCompleted,
-                              onChanged: (_) {
-                                taskProvider.toggleTask(task);
-                              },
-                            ),
-                            title: Text(
-                              task.title,
-                              style: TextStyle(
-                                decoration: task.isCompleted
-                                    ? TextDecoration.lineThrough
-                                    : TextDecoration.none,
-                              ),
-                            ),
-                            trailing: IconButton(
-                              onPressed: () {
-                                taskProvider.removeTask(task);
-                              },
-                              icon: const Icon(Icons.delete),
-                            ),
-                          ),
+                        return TaskItem(
+                          task: task,
+                          onToggle: () {
+                            taskProvider.toggleTask(task);
+                          },
+                          onRemove: () {
+                            taskProvider.removeTask(task);
+                          },
                         );
                       },
                     ),
