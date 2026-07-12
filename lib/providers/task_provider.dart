@@ -13,6 +13,21 @@ class TaskProvider extends ChangeNotifier {
     return _tasks;
   }
 
+  // Retorna a quantidade total de tarefas.
+  int get totalTasks {
+    return _tasks.length;
+  }
+
+  // Retorna a quantidade de tarefas concluídas.
+  int get completedTasks {
+    return _tasks.where((task) => task.isCompleted).length;
+  }
+
+  // Retorna a quantidade de tarefas pendentes.
+  int get pendingTasks {
+    return _tasks.where((task) => !task.isCompleted).length;
+  }
+
   // Adiciona uma nova tarefa.
   void addTask(String title) {
     final String trimmedTitle = title.trim();

@@ -65,7 +65,16 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 24),
-            Text('Total de tarefas: ${taskProvider.tasks.length}'),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 24,
+              runSpacing: 8,
+              children: [
+                Text('Total: ${taskProvider.totalTasks}'),
+                Text('Pendentes: ${taskProvider.pendingTasks}'),
+                Text('Concluídas: ${taskProvider.completedTasks}'),
+              ],
+            ),
             const SizedBox(height: 16),
             Expanded(
               child: taskProvider.tasks.isEmpty
