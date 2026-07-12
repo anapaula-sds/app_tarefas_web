@@ -19,11 +19,13 @@ class _HomePageState extends State<HomePage> {
 
   // Adiciona uma tarefa usando o TaskProvider.
   void _addTask() {
-    final String title = _taskController.text;
+    final String title = _taskController.text.trim();
+
+    if (title.isEmpty) {
+      return;
+    }
 
     context.read<TaskProvider>().addTask(title);
-
-    // Limpa o campo depois de adicionar.
     _taskController.clear();
   }
 
