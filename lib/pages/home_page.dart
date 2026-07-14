@@ -45,9 +45,15 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xFFF3ECFA),
       body: Center(
         child: ConstrainedBox(
+          // Limita a largura máxima do card.
           constraints: const BoxConstraints(maxWidth: 430),
           child: Container(
+            // Cria espaço acima e abaixo do card.
             margin: const EdgeInsets.symmetric(vertical: 24),
+
+            // Faz o conteúdo interno respeitar os cantos arredondados.
+            clipBehavior: Clip.antiAlias,
+
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(24),
@@ -60,89 +66,125 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Minhas Tarefas',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: _taskController,
-                    decoration: const InputDecoration(
-                      labelText: 'Digite uma tarefa',
-                      border: OutlineInputBorder(),
-                    ),
-                    onSubmitted: (_) {
-                      _addTask();
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: _addTask,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6D4AA2),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Adicionar',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 24,
-                    runSpacing: 8,
+
+            // Column principal do card.
+            child: Column(
+              children: [
+                // Cabeçalho roxo.
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                  color: const Color(0xFF7B4BC4),
+                  child: const Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start, // Alinha o texto à esquerda.
                     children: [
-                      Text('Total: ${taskProvider.totalTasks}'),
-                      Text('Pendentes: ${taskProvider.pendingTasks}'),
-                      Text('Concluídas: ${taskProvider.completedTasks}'),
+                      Text(
+                        'Minhas Tarefas',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Organize seu dia, uma tarefa de cada vez',
+                        style: TextStyle(
+                          color: Color(0xFFE9DDF8),
+                          fontSize: 14,
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: taskProvider.tasks.isEmpty
-                        ? const Center(
-                            child: Text('Nenhuma tarefa cadastrada.'),
-                          )
-                        : ListView.builder(
-                            itemCount: taskProvider.tasks.length,
-                            itemBuilder: (context, index) {
-                              final task = taskProvider.tasks[index];
+                ),
 
-                              return TaskItem(
-                                task: task,
-                                onToggle: () {
-                                  taskProvider.toggleTask(task);
+                // Área branca abaixo do cabeçalho.
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _taskController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Digite uma nova tarefa',
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 14,
+                                  ),
+                                ),
+                                onSubmitted: (_) {
+                                  _addTask();
                                 },
-                                onRemove: () {
-                                  taskProvider.removeTask(task);
-                                },
-                              );
-                            },
-                          ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              height: 50,
+                              child: ElevatedButton(
+                                onPressed: _addTask,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF6D4AA2),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 18,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Adicionar',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 24,
+                          runSpacing: 8,
+                          children: [
+                            Text('Total: ${taskProvider.totalTasks}'),
+                            Text('Pendentes: ${taskProvider.pendingTasks}'),
+                            Text('Concluídas: ${taskProvider.completedTasks}'),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: taskProvider.tasks.isEmpty
+                              ? const Center(
+                                  child: Text('Nenhuma tarefa cadastrada.'),
+                                )
+                              : ListView.builder(
+                                  itemCount: taskProvider.tasks.length,
+                                  itemBuilder: (context, index) {
+                                    final task = taskProvider.tasks[index];
+
+                                    return TaskItem(
+                                      task: task,
+                                      onToggle: () {
+                                        taskProvider.toggleTask(task);
+                                      },
+                                      onRemove: () {
+                                        taskProvider.removeTask(task);
+                                      },
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
