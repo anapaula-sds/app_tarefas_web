@@ -29,6 +29,36 @@ class _HomePageState extends State<HomePage> {
     _taskController.clear();
   }
 
+  Widget _buildCounterCard({
+    required int value,
+    required String label,
+    required Color backgroundColor,
+    required Color textColor,
+  }) {
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            value.toString(),
+            style: TextStyle(
+              color: textColor,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(color: textColor, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     // Libera o controlador quando a tela é encerrada.
@@ -147,14 +177,34 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                         const SizedBox(height: 24),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 24,
-                          runSpacing: 8,
+                        Row(
                           children: [
-                            Text('Total: ${taskProvider.totalTasks}'),
-                            Text('Pendentes: ${taskProvider.pendingTasks}'),
-                            Text('Concluídas: ${taskProvider.completedTasks}'),
+                            Expanded(
+                              child: _buildCounterCard(
+                                value: taskProvider.totalTasks,
+                                label: 'Total',
+                                backgroundColor: const Color(0xFFEDE4FA),
+                                textColor: const Color(0xFF7B4BC4),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _buildCounterCard(
+                                value: taskProvider.pendingTasks,
+                                label: 'Pendentes',
+                                backgroundColor: const Color(0xFFFFF2D9),
+                                textColor: const Color(0xFFC98219),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _buildCounterCard(
+                                value: taskProvider.completedTasks,
+                                label: 'Concluídas',
+                                backgroundColor: const Color(0xFFDDF5EA),
+                                textColor: const Color(0xFF259B67),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 16),
