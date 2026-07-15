@@ -33,6 +33,45 @@ class _HomePageState extends State<HomePage> {
     _taskController.clear();
   }
 
+  // Remove uma tarefa após a confirmação do usuário. Future<void> é usado porque a função envolve uma operação assíncrona (exibição de diálogo).
+  Future<void> _confirmRemoveTask(TaskProvider taskProvider, Task task) async {
+    final bool? confirmed = await showDialog<bool>( // showDialog é usado para exibir um diálogo de confirmação. Ele retorna um Future que completa com o valor selecionado pelo usuário (true para confirmar, false para cancelar).
+      context: context,
+      builder: (context) {
+        return AlertDialog( // AlertDialog é um widget que exibe uma caixa de diálogo com título, conteúdo e ações. Ele é usado aqui para perguntar ao usuário se ele tem certeza de que deseja excluir a tarefa.
+          title: const Text('Excluir tarefa'),
+          content: const Text('Tem certeza que deseja excluir esta tarefa?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Excluir'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      taskProvider.removeTask(task);
+
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tarefa excluída com sucesso.')),
+      );
+    }
+  }
+
   Widget _buildCounterCard({
     required int value,
     required String label,
@@ -147,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                                 controller: _taskController,
                                 decoration: const InputDecoration(
                                   hintText: 'Digite uma nova tarefa',
-                                  border:  OutlineInputBorder(),
+                                  border: OutlineInputBorder(),
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 14,
@@ -265,7 +304,7 @@ class _HomePageState extends State<HomePage> {
                                         taskProvider.toggleTask(task);
                                       },
                                       onRemove: () {
-                                        taskProvider.removeTask(task);
+                                        _confirmRemoveTask(taskProvider, task); // Chama o método para confirmar a remoção da tarefa, exibindo um diálogo de confirmação antes de removê-la do TaskProvider.
                                       },
                                     );
                                   },
