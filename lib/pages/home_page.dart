@@ -3,18 +3,20 @@ import 'package:provider/provider.dart';
 
 import '../providers/task_provider.dart';
 import '../widgets/task_item.dart';
+import '../models/task.dart';
 
 class HomePage extends StatefulWidget {
+  // stateful widget para permitir a atualização da interface quando o estado muda.
   const HomePage({super.key});
 
   @override
   State<HomePage> createState() {
-    return _HomePageState();
+    return _HomePageState(); // Retorna o estado associado a este widget. _HomePageState é uma classe privada que gerencia o estado da HomePage.
   }
 }
 
 class _HomePageState extends State<HomePage> {
-  // Controla o texto digitado no campo.
+  // TextEditingController é usado para controlar o texto digitado no campo de entrada. Ele permite acessar e modificar o texto do TextField.
   final TextEditingController _taskController = TextEditingController();
 
   // Adiciona uma nova tarefa.
@@ -25,7 +27,9 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    context.read<TaskProvider>().addTask(title);
+    context.read<TaskProvider>().addTask(
+      title,
+    ); // Adiciona a tarefa ao TaskProvider, que gerencia o estado das tarefas. context.read<TaskProvider>() permite acessar o TaskProvider sem escutar mudanças de estado.
     _taskController.clear();
   }
 
@@ -62,13 +66,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     // Libera o controlador quando a tela é encerrada.
-    _taskController.dispose();
+    _taskController
+        .dispose(); // dispose() é chamado quando o widget é removido da árvore de widgets, garantindo que os recursos sejam liberados corretamente.
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Observa as mudanças feitas no TaskProvider.
+    // Observa as mudanças feitas no TaskProvider. context.watch<TaskProvider>() permite que o widget seja reconstruído sempre que o estado do TaskProvider mudar, garantindo que a interface esteja sempre atualizada com os dados mais recentes.
     final TaskProvider taskProvider = context.watch<TaskProvider>();
 
     return Scaffold(
@@ -97,7 +102,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
 
-            // Column principal do card.
+            // Column principal do card. Todos os elementos do card são filhos desta coluna.
             child: Column(
               children: [
                 // Cabeçalho roxo.
@@ -142,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                                 controller: _taskController,
                                 decoration: const InputDecoration(
                                   hintText: 'Digite uma nova tarefa',
-                                  border: OutlineInputBorder(),
+                                  border:  OutlineInputBorder(),
                                   contentPadding: EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 14,
@@ -180,6 +185,7 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           children: [
                             Expanded(
+                              // Cria um card para mostrar o total de tarefas. _buildCounterCard é um método que cria um card estilizado para exibir contadores de tarefas.
                               child: _buildCounterCard(
                                 value: taskProvider.totalTasks,
                                 label: 'Total',
@@ -209,13 +215,48 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const SizedBox(height: 16),
                         Expanded(
-                          child: taskProvider.tasks.isEmpty
+                          child:
+                              taskProvider
+                                  .tasks
+                                  .isEmpty // Verifica se a lista de tarefas está vazia. Se estiver, exibe uma mensagem informando que não há tarefas cadastradas. Caso contrário, exibe a lista de tarefas usando ListView.builder.
                               ? const Center(
-                                  child: Text('Nenhuma tarefa cadastrada.'),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize
+                                        .min, // Define o tamanho da coluna com base no conteúdo, evitando que ocupe todo o espaço disponível.
+                                    children: [
+                                      Icon(
+                                        Icons.assignment_outlined,
+                                        size: 56,
+                                        color: Color(0xFF9B72D3),
+                                      ),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'Nenhuma tarefa cadastrada',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF7B4BC4),
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Adicione sua primeira tarefa e comece a organizar seu dia.',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Color(0xFFAA8BCB),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 )
                               : ListView.builder(
-                                  itemCount: taskProvider.tasks.length,
+                                  // ListView.builder é usado para criar uma lista de tarefas de forma eficiente, construindo apenas os itens visíveis na tela.
+                                  itemCount: taskProvider
+                                      .tasks
+                                      .length, // Define o número de itens na lista com base na quantidade de tarefas no TaskProvider.
                                   itemBuilder: (context, index) {
+                                    // Constrói cada item da lista com base no índice fornecido. O itemBuilder é chamado para cada índice da lista, permitindo criar widgets personalizados para cada tarefa.
                                     final task = taskProvider.tasks[index];
 
                                     return TaskItem(

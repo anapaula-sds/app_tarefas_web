@@ -5,10 +5,10 @@ import '../models/task.dart';
 // Widget que representa uma tarefa na lista.
 class TaskItem extends StatelessWidget {
   final Task task;
-  final VoidCallback onToggle;
-  final VoidCallback onRemove;
+  final VoidCallback onToggle; // Quando o usuário alterna o estado da tarefa (pendente/concluída).
+  final VoidCallback onRemove; // Quando o usuário deseja remover a tarefa.
 
-  const TaskItem({
+  const TaskItem({ // Construtor do widget TaskItem.
     super.key,
     required this.task,
     required this.onToggle,
