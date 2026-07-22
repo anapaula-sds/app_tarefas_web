@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/task.dart';
 
 class TaskProvider extends ChangeNotifier {
-  // Lista onde as tarefas ficam armazenadas temporariamente.
+  // Lista onde as tarefas ficam armazenadas temporariamente. 
+  //changeNotifiers.dart é uma classe que permite que widgets escutem mudanças de estado. 
+  //Ao chamar notifyListeners(), todos os widgets que estão escutando esse provider serão reconstruídos para refletir as mudanças.
   final List<Task> _tasks = [];
 
   // Número usado para gerar o ID da próxima tarefa.

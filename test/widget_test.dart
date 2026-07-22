@@ -29,14 +29,17 @@ void main() {
   testWidgets('deve adicionar uma tarefa e atualizar os contadores', (
     WidgetTester tester,
   ) async {
+    // pumpWidget é usado para renderizar o widget na tela de teste.  
     await tester.pumpWidget(createTestApp());
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(); // pumpAndSettle é usado para aguardar a conclusão de todas as animações e atualizações de estado antes de prosseguir com os testes.
 
+    // enterText é usado para simular a digitação de texto no campo de entrada.
     await tester.enterText(find.byType(TextField), 'Estudar Flutter');
 
-    await tester.tap(find.text('Adicionar'));
+    await tester.tap(find.text('Adicionar')); //tap é usado para simular o toque em um botão ou outro widget interativo.
     await tester.pumpAndSettle();
 
+    // expect(find.text('Estudar Flutter'), findsOneWidget); // Verifica se a tarefa foi adicionada à lista; // findsOneWidget é usado para verificar se o widget foi encontrado exatamente uma vez na árvore de widgets.
     expect(find.text('Estudar Flutter'), findsOneWidget);
     expect(find.text('Total: 1'), findsOneWidget);
     expect(find.text('Pendentes: 1'), findsOneWidget);
