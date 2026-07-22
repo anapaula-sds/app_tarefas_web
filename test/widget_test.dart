@@ -13,54 +13,156 @@ Widget createTestApp() {
 }
 
 void main() {
-  testWidgets('deve exibir o estado inicial sem tarefas', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(createTestApp());
-    await tester.pumpAndSettle();
+  testWidgets(
+    'deve exibir o estado inicial sem tarefas',
+    (WidgetTester tester) async {
+      // Renderiza o aplicativo para o teste.
+      await tester.pumpWidget(createTestApp());
+      await tester.pumpAndSettle();
 
-    expect(find.text('Minhas Tarefas'), findsOneWidget);
-    expect(find.text('Total: 0'), findsOneWidget);
-    expect(find.text('Pendentes: 0'), findsOneWidget);
-    expect(find.text('Concluídas: 0'), findsOneWidget);
-    expect(find.text('Nenhuma tarefa cadastrada.'), findsOneWidget);
-  });
+      // Verifica o título da aplicação.
+      expect(
+        find.text('Minhas Tarefas'),
+        findsOneWidget,
+      );
 
-  testWidgets('deve adicionar uma tarefa e atualizar os contadores', (
-    WidgetTester tester,
-  ) async {
-    // pumpWidget é usado para renderizar o widget na tela de teste.  
-    await tester.pumpWidget(createTestApp());
-    await tester.pumpAndSettle(); // pumpAndSettle é usado para aguardar a conclusão de todas as animações e atualizações de estado antes de prosseguir com os testes.
+      // Verifica os nomes dos contadores.
+      expect(
+        find.text('Total'),
+        findsOneWidget,
+      );
 
-    // enterText é usado para simular a digitação de texto no campo de entrada.
-    await tester.enterText(find.byType(TextField), 'Estudar Flutter');
+      expect(
+        find.text('Pendentes'),
+        findsOneWidget,
+      );
 
-    await tester.tap(find.text('Adicionar')); //tap é usado para simular o toque em um botão ou outro widget interativo.
-    await tester.pumpAndSettle();
+      expect(
+        find.text('Concluídas'),
+        findsOneWidget,
+      );
 
-    // expect(find.text('Estudar Flutter'), findsOneWidget); // Verifica se a tarefa foi adicionada à lista; // findsOneWidget é usado para verificar se o widget foi encontrado exatamente uma vez na árvore de widgets.
-    expect(find.text('Estudar Flutter'), findsOneWidget);
-    expect(find.text('Total: 1'), findsOneWidget);
-    expect(find.text('Pendentes: 1'), findsOneWidget);
-    expect(find.text('Concluídas: 0'), findsOneWidget);
-    expect(find.text('Nenhuma tarefa cadastrada.'), findsNothing);
-  });
+      // No estado inicial, os três contadores possuem valor zero.
+      expect(
+        find.text('0'),
+        findsNWidgets(3),
+      );
 
-  testWidgets('não deve adicionar uma tarefa vazia', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(createTestApp());
-    await tester.pumpAndSettle();
+      // Verifica se a mensagem de lista vazia aparece.
+      expect(
+        find.text('Nenhuma tarefa cadastrada'),
+        findsOneWidget,
+      );
+    },
+  );
 
-    await tester.enterText(find.byType(TextField), '   ');
+  testWidgets(
+    'deve adicionar uma tarefa e atualizar os contadores',
+    (WidgetTester tester) async {
+      // Renderiza o aplicativo para o teste.
+      await tester.pumpWidget(createTestApp());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Adicionar'));
-    await tester.pumpAndSettle();
+      // Digita o título da nova tarefa.
+      await tester.enterText(
+        find.byType(TextField),
+        'Estudar Flutter',
+      );
 
-    expect(find.text('Total: 0'), findsOneWidget);
-    expect(find.text('Pendentes: 0'), findsOneWidget);
-    expect(find.text('Concluídas: 0'), findsOneWidget);
-    expect(find.text('Nenhuma tarefa cadastrada.'), findsOneWidget);
-  });
+      // Abre o calendário da data de início.
+      await tester.tap(
+        find.text('Data início'),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Confirma a data inicial selecionada pelo calendário.
+      await tester.tap(
+        find.text('OK'),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Abre o calendário da data de fim.
+      await tester.tap(
+        find.text('Data fim'),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Confirma a data final selecionada pelo calendário.
+      await tester.tap(
+        find.text('OK'),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Adiciona a tarefa.
+      await tester.tap(
+        find.text('Adicionar'),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verifica se a tarefa aparece na lista.
+      expect(
+        find.text('Estudar Flutter'),
+        findsOneWidget,
+      );
+
+      // Agora existem:
+      // Total = 1
+      // Pendentes = 1
+      // Concluídas = 0
+      expect(
+        find.text('1'),
+        findsNWidgets(2),
+      );
+
+      expect(
+        find.text('0'),
+        findsOneWidget,
+      );
+
+      // A mensagem de lista vazia não deve mais aparecer.
+      expect(
+        find.text('Nenhuma tarefa cadastrada'),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
+    'não deve adicionar uma tarefa vazia',
+    (WidgetTester tester) async {
+      // Renderiza o aplicativo para o teste.
+      await tester.pumpWidget(createTestApp());
+      await tester.pumpAndSettle();
+
+      // Digita apenas espaços no campo.
+      await tester.enterText(
+        find.byType(TextField),
+        '   ',
+      );
+
+      // Tenta adicionar a tarefa.
+      await tester.tap(
+        find.text('Adicionar'),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Os três contadores devem continuar zerados.
+      expect(
+        find.text('0'),
+        findsNWidgets(3),
+      );
+
+      // A mensagem de lista vazia deve continuar aparecendo.
+      expect(
+        find.text('Nenhuma tarefa cadastrada'),
+        findsOneWidget,
+      );
+    },
+  );
 }

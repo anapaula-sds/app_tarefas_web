@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import '../models/task.dart';
 
 class TaskProvider extends ChangeNotifier {
-  // Lista onde as tarefas ficam armazenadas temporariamente. 
-  //changeNotifiers.dart é uma classe que permite que widgets escutem mudanças de estado. 
-  //Ao chamar notifyListeners(), todos os widgets que estão escutando esse provider serão reconstruídos para refletir as mudanças.
+  // Lista onde as tarefas ficam armazenadas temporariamente.
+  // ChangeNotifier é uma classe que permite que widgets escutem mudanças de estado.
+  // Ao chamar notifyListeners(), todos os widgets que estão escutando
+  // esse provider serão reconstruídos para refletir as mudanças.
   final List<Task> _tasks = [];
 
   // Número usado para gerar o ID da próxima tarefa.
@@ -31,7 +32,11 @@ class TaskProvider extends ChangeNotifier {
   }
 
   // Adiciona uma nova tarefa.
-  void addTask(String title) {
+  void addTask(
+    String title,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
     final String trimmedTitle = title.trim();
 
     // Não adiciona uma tarefa vazia.
@@ -39,8 +44,14 @@ class TaskProvider extends ChangeNotifier {
       return;
     }
 
-    // Cria uma nova tarefa com um ID sequencial.
-    final Task newTask = Task(id: _nextId.toString(), title: trimmedTitle);
+    // Cria uma nova tarefa com um ID sequencial,
+    // título, data de início e data de fim.
+    final Task newTask = Task(
+      id: _nextId.toString(),
+      title: trimmedTitle,
+      startDate: startDate,
+      endDate: endDate,
+    );
 
     // Prepara o próximo ID.
     _nextId++;
