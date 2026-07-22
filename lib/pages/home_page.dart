@@ -310,33 +310,170 @@ class _HomePageState extends State<HomePage> {
 
                     child: Column(
                       children: [
-                        // Campo de nova tarefa + botão adicionar.
+                        // Área de cadastro da nova tarefa.
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            // Campo de tarefa e datas.
                             Expanded(
-                              child: TextField(
-                                controller: _taskController,
+                              child: Column(
+                                children: [
+                                  // Campo para digitar a nova tarefa.
+                                  SizedBox(
+                                    height: 50,
+                                    child: TextField(
+                                      controller: _taskController,
 
-                                decoration: const InputDecoration(
-                                  hintText: 'Digite uma nova tarefa',
-                                  border: OutlineInputBorder(),
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 14,
+                                      decoration: InputDecoration(
+                                        hintText: 'Digite uma nova tarefa',
+
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 14,
+                                        ),
+
+                                        // Mantém a mesma cor de borda
+                                        // utilizada nos campos de data.
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFFD8C7EA),
+                                          ),
+                                        ),
+
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFFD8C7EA),
+                                          ),
+                                        ),
+
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFF7B4BC4),
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                      ),
+
+                                      onSubmitted: (_) {
+                                        _addTask();
+                                      },
+                                    ),
                                   ),
-                                ),
 
-                                onSubmitted: (_) {
-                                  _addTask();
-                                },
+                                  const SizedBox(height: 6),
+
+                                  // Seleção de data inicial e data final.
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: SizedBox(
+                                          height: 50,
+                                          child: OutlinedButton.icon(
+                                            onPressed: _selectStartDate,
+
+                                            icon: const Icon(
+                                              Icons
+                                                  .calendar_today_outlined,
+                                              size: 18,
+                                            ),
+
+                                            label: Text(
+                                              _startDate == null
+                                                  ? 'Data início'
+                                                  : _formatDate(
+                                                      _startDate!,
+                                                    ),
+                                            ),
+
+                                            style:
+                                                OutlinedButton.styleFrom(
+                                              foregroundColor:
+                                                  const Color(
+                                                0xFF6D4AA2,
+                                              ),
+
+                                              side: const BorderSide(
+                                                color: Color(
+                                                  0xFFD8C7EA,
+                                                ),
+                                              ),
+
+                                              shape:
+                                                  RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  12,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 8),
+
+                                      Expanded(
+                                        child: SizedBox(
+                                          height: 50,
+                                          child: OutlinedButton.icon(
+                                            onPressed: _selectEndDate,
+
+                                            icon: const Icon(
+                                              Icons.event_outlined,
+                                              size: 18,
+                                            ),
+
+                                            label: Text(
+                                              _endDate == null
+                                                  ? 'Data fim'
+                                                  : _formatDate(
+                                                      _endDate!,
+                                                    ),
+                                            ),
+
+                                            style:
+                                                OutlinedButton.styleFrom(
+                                              foregroundColor:
+                                                  const Color(
+                                                0xFF6D4AA2,
+                                              ),
+
+                                              side: const BorderSide(
+                                                color: Color(
+                                                  0xFFD8C7EA,
+                                                ),
+                                              ),
+
+                                              shape:
+                                                  RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  12,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
 
                             const SizedBox(width: 8),
 
+                            // Botão mantém o mesmo tamanho,
+                            // centralizado entre as duas linhas de entrada.
                             SizedBox(
                               height: 50,
-
                               child: ElevatedButton(
                                 onPressed: _addTask,
 
@@ -347,12 +484,14 @@ class _HomePageState extends State<HomePage> {
 
                                   foregroundColor: Colors.white,
 
-                                  padding: const EdgeInsets.symmetric(
+                                  padding:
+                                      const EdgeInsets.symmetric(
                                     horizontal: 18,
                                   ),
 
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
+                                    borderRadius:
+                                        BorderRadius.circular(
                                       15,
                                     ),
                                   ),
@@ -362,89 +501,6 @@ class _HomePageState extends State<HomePage> {
                                   'Adicionar',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // Seleção de data inicial e data final.
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _selectStartDate,
-
-                                icon: const Icon(
-                                  Icons.calendar_today_outlined,
-                                  size: 18,
-                                ),
-
-                                label: Text(
-                                  _startDate == null
-                                      ? 'Data início'
-                                      : _formatDate(_startDate!),
-                                ),
-
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(
-                                    0xFF6D4AA2,
-                                  ),
-
-                                  side: const BorderSide(
-                                    color: Color(0xFFD8C7EA),
-                                  ),
-
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      12,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 8),
-
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _selectEndDate,
-
-                                icon: const Icon(
-                                  Icons.event_outlined,
-                                  size: 18,
-                                ),
-
-                                label: Text(
-                                  _endDate == null
-                                      ? 'Data fim'
-                                      : _formatDate(_endDate!),
-                                ),
-
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: const Color(
-                                    0xFF6D4AA2,
-                                  ),
-
-                                  side: const BorderSide(
-                                    color: Color(0xFFD8C7EA),
-                                  ),
-
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                  ),
-
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      12,
-                                    ),
                                   ),
                                 ),
                               ),
@@ -533,7 +589,8 @@ class _HomePageState extends State<HomePage> {
                                             'Nenhuma tarefa cadastrada',
                                             style: TextStyle(
                                               fontSize: 16,
-                                              fontWeight: FontWeight.w600,
+                                              fontWeight:
+                                                  FontWeight.w600,
                                               color: Color(
                                                 0xFF7B4BC4,
                                               ),
@@ -561,7 +618,8 @@ class _HomePageState extends State<HomePage> {
                               // Quando existem tarefas,
                               // exibe a lista normalmente.
                               : ListView.builder(
-                                  itemCount: taskProvider.tasks.length,
+                                  itemCount:
+                                      taskProvider.tasks.length,
 
                                   itemBuilder: (context, index) {
                                     final Task task =
