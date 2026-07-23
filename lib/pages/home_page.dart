@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/task_provider.dart';
+import '../providers/theme_provider.dart';
 import '../widgets/task_item.dart';
 import '../models/task.dart';
 
@@ -40,7 +41,6 @@ class _HomePageState extends State<HomePage> {
       lastDate: DateTime(2100),
     );
 
-    // Se o usuário escolher uma data, atualiza a tela.
     if (selectedDate != null) {
       setState(() {
         _startDate = selectedDate;
@@ -71,7 +71,6 @@ class _HomePageState extends State<HomePage> {
       lastDate: DateTime(2100),
     );
 
-    // Se o usuário escolher uma data, atualiza a tela.
     if (selectedDate != null) {
       setState(() {
         _endDate = selectedDate;
@@ -92,9 +91,7 @@ class _HomePageState extends State<HomePage> {
     if (_startDate == null || _endDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Selecione a data de início e a data de fim.',
-          ),
+          content: Text('Selecione a data de início e a data de fim.'),
         ),
       );
 
@@ -115,11 +112,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // Envia título, data inicial e data final para o Provider.
-    context.read<TaskProvider>().addTask(
-      title,
-      _startDate!,
-      _endDate!,
-    );
+    context.read<TaskProvider>().addTask(title, _startDate!, _endDate!);
 
     // Limpa o campo de texto.
     _taskController.clear();
@@ -132,18 +125,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Remove uma tarefa após a confirmação do usuário.
-  Future<void> _confirmRemoveTask(
-    TaskProvider taskProvider,
-    Task task,
-  ) async {
+  Future<void> _confirmRemoveTask(TaskProvider taskProvider, Task task) async {
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Excluir tarefa'),
-          content: const Text(
-            'Tem certeza que deseja excluir esta tarefa?',
-          ),
+          content: const Text('Tem certeza que deseja excluir esta tarefa?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -170,11 +158,7 @@ class _HomePageState extends State<HomePage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Tarefa excluída com sucesso.',
-          ),
-        ),
+        const SnackBar(content: Text('Tarefa excluída com sucesso.')),
       );
     }
   }
@@ -187,7 +171,8 @@ class _HomePageState extends State<HomePage> {
     required Color textColor,
   }) {
     return Container(
-      height: 80,
+      // Altura reduzida para deixar os contadores mais compactos.
+      height: 64,
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(14),
@@ -199,18 +184,12 @@ class _HomePageState extends State<HomePage> {
             value.toString(),
             style: TextStyle(
               color: textColor,
-              fontSize: 22,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 12,
-            ),
-          ),
+          const SizedBox(height: 2),
+          Text(label, style: TextStyle(color: textColor, fontSize: 11)),
         ],
       ),
     );
@@ -229,31 +208,52 @@ class _HomePageState extends State<HomePage> {
     // Observa as mudanças feitas no TaskProvider.
     final TaskProvider taskProvider = context.watch<TaskProvider>();
 
+    // Observa as mudanças feitas no ThemeProvider.
+    // Quando o tema muda, a HomePage é reconstruída.
+    final ThemeProvider themeProvider = context.watch<ThemeProvider>();
+
+    // Verifica se o tema escuro está ativo.
+    final bool isDarkMode = themeProvider.isDarkMode;
+
+    // Cor do fundo externo do aplicativo.
+    final Color backgroundColor = isDarkMode
+        ? const Color(0xFF18141F)
+        : const Color(0xFFF3ECFA);
+
+    // Cor da área principal do aplicativo.
+    final Color contentColor = isDarkMode
+        ? const Color(0xFF241F2C)
+        : Colors.white;
+
+    // Cor da borda externa do aplicativo.
+    final Color borderColor = isDarkMode
+        ? const Color(0xFF3A3147)
+        : const Color(0xFFE0D4EC);
+
+    // Cor do texto e dos ícones dos botões de data.
+    final Color dateButtonColor = isDarkMode
+        ? const Color(0xFFD8C7EA)
+        : const Color(0xFF6D4AA2);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF3ECFA),
+      backgroundColor: backgroundColor,
 
       body: Center(
         child: ConstrainedBox(
           // Mantém o aplicativo com formato semelhante a um celular.
-          constraints: const BoxConstraints(
-            maxWidth: 430,
-          ),
+          constraints: const BoxConstraints(maxWidth: 430),
 
           child: Container(
             // Espaço acima e abaixo do card.
-            margin: const EdgeInsets.symmetric(
-              vertical: 24,
-            ),
+            margin: const EdgeInsets.symmetric(vertical: 24),
 
             // Faz o conteúdo respeitar os cantos arredondados.
             clipBehavior: Clip.antiAlias,
 
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: contentColor,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: const Color(0xFFE0D4EC),
-              ),
+              border: Border.all(color: borderColor),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x1A000000),
@@ -269,44 +269,85 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   width: double.infinity,
 
-                  padding: const EdgeInsets.fromLTRB(
-                    24,
-                    28,
-                    24,
-                    24,
-                  ),
+                  // Padding reduzido para deixar o cabeçalho mais compacto.
+                  padding: const EdgeInsets.fromLTRB(20, 20, 16, 18),
 
                   color: const Color(0xFF7B4BC4),
 
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // Linha com título e botão de troca de tema.
+                  child: Row(
                     children: [
-                      Text(
-                        'Minhas Tarefas',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Minhas Tarefas',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 23,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            SizedBox(height: 6),
+
+                            Text(
+                              'Organize seu dia, uma tarefa de cada vez',
+                              style: TextStyle(
+                                color: Color(0xFFE9DDF8),
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                      SizedBox(height: 8),
+                      // Botão que alterna entre tema claro e escuro.
+                      IconButton(
+                        tooltip: isDarkMode
+                            ? 'Ativar tema claro'
+                            : 'Ativar tema escuro',
 
-                      Text(
-                        'Organize seu dia, uma tarefa de cada vez',
-                        style: TextStyle(
-                          color: Color(0xFFE9DDF8),
-                          fontSize: 14,
+                        onPressed: () {
+                          themeProvider.toggleTheme();
+                        },
+
+                        style: IconButton.styleFrom(
+                          backgroundColor: const Color(0x26FFFFFF),
+
+                          foregroundColor: Colors.white,
+
+                          hoverColor: const Color(0x40FFFFFF),
+
+                          highlightColor: const Color(0x33FFFFFF),
+
+                          side: const BorderSide(color: Color(0x66FFFFFF)),
+
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+
+                          // Botão de tema reduzido proporcionalmente.
+                          fixedSize: const Size(40, 40),
+                        ),
+
+                        icon: Icon(
+                          isDarkMode
+                              ? Icons.light_mode_outlined
+                              : Icons.dark_mode_outlined,
+                          size: 20,
                         ),
                       ),
                     ],
                   ),
                 ),
 
-                // Área branca abaixo do cabeçalho.
+                // Área abaixo do cabeçalho.
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.all(24),
+                    // Reduz o espaço interno geral da área de conteúdo.
+                    padding: const EdgeInsets.all(20),
 
                     child: Column(
                       children: [
@@ -320,7 +361,9 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   // Campo para digitar a nova tarefa.
                                   SizedBox(
-                                    height: 50,
+                                    // Altura reduzida de 50 para 44.
+                                    height: 44,
+
                                     child: TextField(
                                       controller: _taskController,
 
@@ -329,31 +372,32 @@ class _HomePageState extends State<HomePage> {
 
                                         contentPadding:
                                             const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 14,
-                                        ),
+                                              horizontal: 14,
+                                              vertical: 11,
+                                            ),
 
-                                        // Mantém a mesma cor de borda
-                                        // utilizada nos campos de data.
                                         border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           borderSide: const BorderSide(
                                             color: Color(0xFFD8C7EA),
                                           ),
                                         ),
 
                                         enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           borderSide: const BorderSide(
                                             color: Color(0xFFD8C7EA),
                                           ),
                                         ),
 
                                         focusedBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           borderSide: const BorderSide(
                                             color: Color(0xFF7B4BC4),
                                             width: 1.5,
@@ -367,50 +411,41 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
 
-                                  const SizedBox(height: 6),
+                                  // Espaço menor entre o campo e as datas.
+                                  const SizedBox(height: 4),
 
                                   // Seleção de data inicial e data final.
                                   Row(
                                     children: [
                                       Expanded(
                                         child: SizedBox(
-                                          height: 50,
+                                          // Altura reduzida.
+                                          height: 44,
+
                                           child: OutlinedButton.icon(
                                             onPressed: _selectStartDate,
 
                                             icon: const Icon(
-                                              Icons
-                                                  .calendar_today_outlined,
+                                              Icons.calendar_today_outlined,
                                               size: 18,
                                             ),
 
                                             label: Text(
                                               _startDate == null
                                                   ? 'Data início'
-                                                  : _formatDate(
-                                                      _startDate!,
-                                                    ),
+                                                  : _formatDate(_startDate!),
                                             ),
 
-                                            style:
-                                                OutlinedButton.styleFrom(
-                                              foregroundColor:
-                                                  const Color(
-                                                0xFF6D4AA2,
-                                              ),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: dateButtonColor,
 
                                               side: const BorderSide(
-                                                color: Color(
-                                                  0xFFD8C7EA,
-                                                ),
+                                                color: Color(0xFFD8C7EA),
                                               ),
 
-                                              shape:
-                                                  RoundedRectangleBorder(
+                                              shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                  12,
-                                                ),
+                                                    BorderRadius.circular(12),
                                               ),
                                             ),
                                           ),
@@ -421,7 +456,9 @@ class _HomePageState extends State<HomePage> {
 
                                       Expanded(
                                         child: SizedBox(
-                                          height: 50,
+                                          // Altura reduzida.
+                                          height: 44,
+
                                           child: OutlinedButton.icon(
                                             onPressed: _selectEndDate,
 
@@ -433,30 +470,19 @@ class _HomePageState extends State<HomePage> {
                                             label: Text(
                                               _endDate == null
                                                   ? 'Data fim'
-                                                  : _formatDate(
-                                                      _endDate!,
-                                                    ),
+                                                  : _formatDate(_endDate!),
                                             ),
 
-                                            style:
-                                                OutlinedButton.styleFrom(
-                                              foregroundColor:
-                                                  const Color(
-                                                0xFF6D4AA2,
-                                              ),
+                                            style: OutlinedButton.styleFrom(
+                                              foregroundColor: dateButtonColor,
 
                                               side: const BorderSide(
-                                                color: Color(
-                                                  0xFFD8C7EA,
-                                                ),
+                                                color: Color(0xFFD8C7EA),
                                               ),
 
-                                              shape:
-                                                  RoundedRectangleBorder(
+                                              shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                  12,
-                                                ),
+                                                    BorderRadius.circular(12),
                                               ),
                                             ),
                                           ),
@@ -470,45 +496,39 @@ class _HomePageState extends State<HomePage> {
 
                             const SizedBox(width: 8),
 
-                            // Botão mantém o mesmo tamanho,
-                            // centralizado entre as duas linhas de entrada.
+                            // Botão Adicionar com destaque de ação positiva.
                             SizedBox(
-                              height: 50,
+                              // Mantém alinhamento, mas fica mais compacto.
+                              height: 44,
+
                               child: ElevatedButton(
                                 onPressed: _addTask,
 
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(
-                                    0xFF6D4AA2,
-                                  ),
+                                  backgroundColor: const Color(0xFF259B67),
 
                                   foregroundColor: Colors.white,
 
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                    horizontal: 18,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
                                   ),
 
                                   shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      15,
-                                    ),
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
                                 ),
 
                                 child: const Text(
                                   'Adicionar',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(fontWeight: FontWeight.w600),
                                 ),
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 24),
+                        // Espaço reduzido antes dos contadores.
+                        const SizedBox(height: 18),
 
                         // Cards de contadores.
                         Row(
@@ -517,12 +537,8 @@ class _HomePageState extends State<HomePage> {
                               child: _buildCounterCard(
                                 value: taskProvider.totalTasks,
                                 label: 'Total',
-                                backgroundColor: const Color(
-                                  0xFFEDE4FA,
-                                ),
-                                textColor: const Color(
-                                  0xFF7B4BC4,
-                                ),
+                                backgroundColor: const Color(0xFFEDE4FA),
+                                textColor: const Color(0xFF7B4BC4),
                               ),
                             ),
 
@@ -532,12 +548,8 @@ class _HomePageState extends State<HomePage> {
                               child: _buildCounterCard(
                                 value: taskProvider.pendingTasks,
                                 label: 'Pendentes',
-                                backgroundColor: const Color(
-                                  0xFFFFF2D9,
-                                ),
-                                textColor: const Color(
-                                  0xFFC98219,
-                                ),
+                                backgroundColor: const Color(0xFFFFF2D9),
+                                textColor: const Color(0xFFC98219),
                               ),
                             ),
 
@@ -547,25 +559,73 @@ class _HomePageState extends State<HomePage> {
                               child: _buildCounterCard(
                                 value: taskProvider.completedTasks,
                                 label: 'Concluídas',
-                                backgroundColor: const Color(
-                                  0xFFDDF5EA,
-                                ),
-                                textColor: const Color(
-                                  0xFF259B67,
+                                backgroundColor: const Color(0xFFDDF5EA),
+                                textColor: const Color(0xFF259B67),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Espaço reduzido antes do título da lista.
+                        const SizedBox(height: 16),
+
+                        // Cabeçalho da área onde as tarefas são exibidas.
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Suas tarefas',
+                              style: TextStyle(
+                                // Título levemente menor.
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+
+                                color: isDarkMode
+                                    ? const Color(0xFFF2ECF8)
+                                    : const Color(0xFF4A3B57),
+                              ),
+                            ),
+
+                            // Pill que mostra a quantidade de tarefas.
+                            Container(
+                              // Pill mais compacta.
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+
+                              decoration: BoxDecoration(
+                                color: isDarkMode
+                                    ? const Color(0xFF3A3147)
+                                    : const Color(0xFFEDE4FA),
+
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+
+                              child: Text(
+                                taskProvider.totalTasks == 1
+                                    ? '1 tarefa'
+                                    : '${taskProvider.totalTasks} tarefas',
+
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+
+                                  color: isDarkMode
+                                      ? const Color(0xFFD8C7EA)
+                                      : const Color(0xFF7B4BC4),
                                 ),
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 16),
+                        // Espaço menor entre o título e a lista.
+                        const SizedBox(height: 10),
 
                         // Lista de tarefas ou estado vazio.
                         Expanded(
                           child: taskProvider.tasks.isEmpty
-
-                              // Quando não existem tarefas,
-                              // permite rolagem caso a altura da tela seja pequena.
                               ? const SingleChildScrollView(
                                   child: Center(
                                     child: Padding(
@@ -578,9 +638,7 @@ class _HomePageState extends State<HomePage> {
                                           Icon(
                                             Icons.assignment_outlined,
                                             size: 48,
-                                            color: Color(
-                                              0xFF9B72D3,
-                                            ),
+                                            color: Color(0xFF9B72D3),
                                           ),
 
                                           SizedBox(height: 12),
@@ -589,11 +647,8 @@ class _HomePageState extends State<HomePage> {
                                             'Nenhuma tarefa cadastrada',
                                             style: TextStyle(
                                               fontSize: 16,
-                                              fontWeight:
-                                                  FontWeight.w600,
-                                              color: Color(
-                                                0xFF7B4BC4,
-                                              ),
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF7B4BC4),
                                             ),
                                           ),
 
@@ -604,9 +659,7 @@ class _HomePageState extends State<HomePage> {
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Color(
-                                                0xFFAA8BCB,
-                                              ),
+                                              color: Color(0xFFAA8BCB),
                                             ),
                                           ),
                                         ],
@@ -614,31 +667,23 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                 )
-
                               // Quando existem tarefas,
                               // exibe a lista normalmente.
                               : ListView.builder(
-                                  itemCount:
-                                      taskProvider.tasks.length,
+                                  itemCount: taskProvider.tasks.length,
 
                                   itemBuilder: (context, index) {
-                                    final Task task =
-                                        taskProvider.tasks[index];
+                                    final Task task = taskProvider.tasks[index];
 
                                     return TaskItem(
                                       task: task,
 
                                       onToggle: () {
-                                        taskProvider.toggleTask(
-                                          task,
-                                        );
+                                        taskProvider.toggleTask(task);
                                       },
 
                                       onRemove: () {
-                                        _confirmRemoveTask(
-                                          taskProvider,
-                                          task,
-                                        );
+                                        _confirmRemoveTask(taskProvider, task);
                                       },
                                     );
                                   },

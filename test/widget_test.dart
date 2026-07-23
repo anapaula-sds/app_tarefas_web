@@ -1,13 +1,24 @@
 import 'package:app_tarefas_web/main.dart';
 import 'package:app_tarefas_web/providers/task_provider.dart';
+import 'package:app_tarefas_web/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-// Cria o aplicativo com o Provider necessário para os testes.
+// Cria o aplicativo com os Providers necessários para os testes.
 Widget createTestApp() {
-  return ChangeNotifierProvider(
-    create: (_) => TaskProvider(),
+  return MultiProvider(
+    providers: [
+      // Provider responsável pelo estado das tarefas.
+      ChangeNotifierProvider(
+        create: (_) => TaskProvider(),
+      ),
+
+      // Provider responsável pelo tema claro e escuro.
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),
+      ),
+    ],
     child: const MyApp(),
   );
 }
